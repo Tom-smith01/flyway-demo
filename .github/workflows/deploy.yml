@@ -1,0 +1,24 @@
+name: Production DB Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'sql/**'
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Run Flyway Migrate
+        run: |
+          echo "🚀 开始安全部署数据库..."
+          /usr/local/bin/flyway migrate \
+            -url="jdbc:postgresql://${{ secrets.DB_HOST }}:5432/postgres" \
+            -user="${{ secrets.DB_USER }}" \
+            -password="${{ secrets.DB_PASSWORD }}" \
+            -locations="filesystem:sql"
